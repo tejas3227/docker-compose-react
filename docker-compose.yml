@@ -1,0 +1,56 @@
+version: '3.8'
+
+networks:
+  app-network:
+    driver: bridge
+
+services:
+  sql:
+    image: mysql:8.0    #official MySQL image 
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      retries: 5
+
+    container_name: mysql-container  #container name
+    environment:  
+      - MYSQL_ROOT_PASSWORD=root    #env variables
+      - MYSQL_DATABASE=testdb
+      - MYSQL_USER=appuser
+      - MYSQL_PASSWORD=apppass
+    ports:
+      - "3307:3306"     #hostport:containerport
+    volumes:
+      - mysql-data:/var/lib/mysql   #map volume to container volume
+    networks:
+      - app-network
+
+  backend:
+    build: ./backend   #build backend image using Dockerfile present in ./backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/users"]
+      interval: 10s
+      retries: 5
+
+    container_name: backend-container   #conatainer name
+    env_file:
+      - ./backend/.env
+    ports:    
+      - "5000:5000"   #port used for node.js
+    depends_on:   #it will run after mysql part is done
+      - sql
+    networks:
+      - app-network
+
+  frontend:    
+    build: ./frontend    #build fronted image using Dockerfile present in ./frontend
+    container_name: frontend-conatainer   
+    ports:
+      - 3000:80  # map host 3000 → container port 80
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  mysql-data:
