@@ -29,8 +29,8 @@ pipeline {
         stage('Push Images') {
             steps {
                 sh '''
-                  docker push tejas85852/react-frontend:latest
-                  docker push tejas85852/react-backend:latest
+                  docker push tejas85852/react-app:frontend
+                  docker push tejas85852/react-app:backend
                 '''
             }
         }
