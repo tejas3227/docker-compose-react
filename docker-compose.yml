@@ -27,6 +27,7 @@ services:
 
   backend:
     build: ./backend   #build backend image using Dockerfile present in ./backend
+    image: tejas85852/react-app:backend
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5000/users"]
       interval: 10s
@@ -44,6 +45,7 @@ services:
 
   frontend:    
     build: ./frontend    #build fronted image using Dockerfile present in ./frontend
+    image: tejas85852/react-app:frontend
     container_name: frontend-conatainer   
     ports:
       - 3000:80  # map host 3000 → container port 80
